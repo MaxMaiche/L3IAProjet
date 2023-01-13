@@ -80,11 +80,37 @@ class Node:
     
     def __str__(self):
         return "(" + str(self.x) + "," + str(self.y) + ")"
-        
+
+class player:
+    def __init__(self, value:int):
+        self.value = value
+        self.pions = set()
+        self.coups = dict()
+
+    def getCoups(self)->dict:
+        for pion in self.pions:
+            self.coups[pion] = pion.coupsValide()
+        return self.coups
+    
+    def getCoups(self, node:Node)->set:
+        return self.coups[node]
+    
+    def play(self, node:Node, node2:Node)->None:
+        node.value = 0
+        node2.value = self.value
+        self.pions.remove(node)
+        self.pions.add(node2)
+        self.getCoups()
+
+
 class Game:
     def __init__(self):
         self.end = False
         self.board = []
+
+        self.joueur = player(1)
+        self.agent = player(2)
+
         for x,y in itertools.product(range(9), range(9)):
             self.board.append(Node(self,x,y))
         
@@ -95,11 +121,14 @@ class Game:
             for x in range(5+y, 9):
                 node = self.getNode(x,y)
                 node.value = 1
+                self.joueur.pions.add(node)
                 
         for x in range(4):
             for y in range(5+x, 9):
                 node = self.getNode(x,y)
                 node.value = 2
+                self.agent.pions.add(node)
+
         
     
     def getNode(self, x, y) -> Node:
@@ -107,22 +136,9 @@ class Game:
             return None
         return self.board[x*9+y]
     
-    
-    def printBoard(self) -> None:
-        for y in range(9):
-            for x in range(9):
-                node = self.getNode(x,y)
-                if node.value == 0:
-                    print("#", end="  ")
-                elif node.value == 1:
-                    print("X", end="  ")
-                elif node.value == 2:
-                    print("O", end="  ")
-            print()
-            
-            
+   
  
-    def printPyramides(self):
+    def print(self):
         for y in range(8,0,-1):
             
             chaine = "  " * y
@@ -149,9 +165,4 @@ class Game:
             
 
 g = Game()
-
-coups = g.getNode(6,1).coupsValide()
-for c in coups:
-    c.value="X"
-
-g.printPyramides()      
+g.print()      
