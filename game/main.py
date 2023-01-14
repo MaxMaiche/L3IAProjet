@@ -7,6 +7,7 @@ class Node:
         self.x = x
         self.y = y
         self.value = 0
+        self.score = 0
         self.voisins = []
         
     def setVoisins(self)->None:
@@ -130,6 +131,30 @@ class Game:
                 self.agent.pions.add(node)
 
         
+        for y in range(8,0,-1):
+            score = 8+y
+            x=0
+            self.getNode(x,y).score = score
+            while y!=8:
+                x+=1
+                y+=1
+                self.getNode(x,y).score = score
+        
+        for i in range(0,9):
+            self.getNode(i,i).score = 8
+        
+        for x in range(1,9):
+            score = 8-x
+            y=0
+            self.getNode(x,y).score = score
+            while x!=8:
+                x+=1
+                y+=1
+                self.getNode(x,y).score = score
+            
+            
+
+        
     
     def getNode(self, x, y) -> Node:
         if x<0 or x>8 or y<0 or y>8:
@@ -165,4 +190,7 @@ class Game:
             
 
 g = Game()
+
+for node in g.board:
+    node.value = node.score
 g.print()      
