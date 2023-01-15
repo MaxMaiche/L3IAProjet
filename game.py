@@ -91,6 +91,10 @@ class Node:
 class player:
     def __init__(self, value:int):
         self.value = value
+        if value == 1:
+            self.score = 20 # score de base du joueur
+        else:
+            self.score = 140 # score de base du joueur
         self.pions = set()
         self.coups = dict()
 
@@ -110,6 +114,10 @@ class player:
     def play(self, node:Node, node2:Node,game)->bool:
         node.value = 0
         node2.value = self.value
+
+        score = node.score - node2.score
+        self.score -= score
+
         self.pions.remove(node)
         self.pions.add(node2)
         self.getCoups()

@@ -31,8 +31,15 @@ def greedyAgent(game:game):
         if score >0:
             stuck = False
             break
+
     if stuck:
-        move = random.choice(list)
+        for key in coups:
+            if key.score == 4:
+                list=[]
+                for value in coups[key]:
+                    list.append(value)
+                move = (key, random.choice(list))
+                break
     else:
         move = list[listscore.index(max(listscore))]
     b = game.agent.play(move[0],move[1],game)

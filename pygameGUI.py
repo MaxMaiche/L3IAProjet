@@ -72,13 +72,14 @@ def draw_coupsValide(coups:set, circles:list):
 def draw_window(game,circles:list, coups:set):
     WIN.fill((15,85,200))
     circles.clear()
-    if not game.end:
-        draw_board(game, circles)
-        draw_coupsValide(coups, circles)
-    else:
+    if game.end:
         font = pygame.font.SysFont('comicsans', 100)
-        text = font.render('Fin de la partie', 1, (255,255,255))
+        text = font.render('Fin de la partie', 1, (37,37,37))
         WIN.blit(text, (WIDTH/2 - text.get_width()/2, HEIGHT/2 - text.get_height()/2))
+
+    draw_board(game, circles)
+    draw_coupsValide(coups, circles)
+
     pygame.display.update()
 
 
