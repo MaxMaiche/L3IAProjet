@@ -10,6 +10,7 @@ class Node:
         self.value = 0
         self.score = 0
         self.voisins = []
+        self.coupsValide = set()
         
     def setVoisins(self)->None:
         x=self.x
@@ -46,7 +47,7 @@ class Node:
     def getVoisin(self,i):
         return self.voisins[i]
 
-    def coupsValide(self)->set:
+    def getCoupsValide(self)->set:
         coups = {self}
         nodes = [self]
         nodesSaut = []
@@ -64,6 +65,7 @@ class Node:
     
         coups = self.getCoupsSaut(coups,nodesSaut)
         coups.remove(self)
+        self.coupsValide = coups
         return coups
     
     def getCoupsSaut(self,coups,nodes:list)->set:
@@ -79,7 +81,10 @@ class Node:
                         nodes.append(voisin.getVoisin(i))
                         coups.add(voisin.getVoisin(i))
         return coups
-    
+
+    def __lt__ (self, other):
+        return self.score < other.score
+        
     def __str__(self):
         return "(" + str(self.x) + "," + str(self.y) + ")"
 
@@ -90,8 +95,15 @@ class player:
         self.coups = dict()
 
     def getCoups(self)->dict:
+        self.coups.clear()
         for pion in self.pions:
-            self.coups[pion] = pion.coupsValide()
+            self.coups[pion] = pion.getCoupsValide()
+        return self.coups
+    
+    def getCoupsScore(self)->dict:
+        self.coups.clear()
+        for pion in self.pions:
+            self.coups[pion] = pion.getCoupsScore()
         return self.coups
 
     

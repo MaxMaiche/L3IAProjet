@@ -1,6 +1,6 @@
 import pygame
 import game
-
+import agent
 pygame.init()
 
 WIDTH, HEIGHT = 700, 1000
@@ -101,31 +101,29 @@ def main(game):
                 trouve = False
                 for i, (x, y, val, node_x, node_y) in enumerate(circles):
                     if (x - mouse_x) ** 2 + (y - mouse_y) ** 2 <= 25 ** 2:
-                        if val == 1 and game.turn%2 == 1:
-                            node_actuel = game.getNode(node_x, node_y)
-                            coups = node_actuel.coupsValide()
-                            trouve = True
-                            break
-                        elif val == 0 and node_actuel != None:
-                            node = game.getNode(node_x, node_y)
-                            if node in coups:
-                                if game.turn%2 == 1:
-                                    end = game.joueur.play(node_actuel, node, game)
-                                else:
-                                    end = game.agent.play(node_actuel, node, game)
-                                node_actuel = None
-                                coups = set()
+                        if game.turn%2 == 1:
+                            if val == 1:
+                                node_actuel = game.getNode(node_x, node_y)
+                                coups = node_actuel.getCoupsValide()
                                 trouve = True
                                 break
-                        elif val == 2 and game.turn%2 == 0:
-                            node_actuel = game.getNode(node_x, node_y)
-                            coups = node_actuel.coupsValide()
-                            pygame.display.update()
-                            trouve = True
-                            break
-
+                            elif val == 0 and node_actuel != None:
+                                node = game.getNode(node_x, node_y)
+                                if node in coups:
+                                    if game.turn%2 == 1:
+                                        end = game.joueur.play(node_actuel, node, game)
+                                        
+                                    node_actuel = None
+                                    coups = set()
+                                    trouve = True
+                                    break
+                        
                 if not trouve:
                     coups = set()
+
+        if game.turn%2 == 0:
+            #end = agent.randomAgent(game)
+            end = agent.greedyAgent(game)
 
         draw_window(game, circles, coups, end)
 
