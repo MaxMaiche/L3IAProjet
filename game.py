@@ -84,7 +84,7 @@ class Node:
 
     def __lt__ (self, other):
         return self.score < other.score
-        
+
     def __str__(self):
         return "(" + str(self.x) + "," + str(self.y) + ")"
 
@@ -209,14 +209,18 @@ class Game:
             for x in range(5+y, 9):
                 if self.getNode(x,y).value != 2:
                     endAgent = False
+                    break
         
         endJoueur = True
         for x in range(4):
             for y in range(5+x, 9):
                 if self.getNode(x,y).value != 1:
                     endJoueur = False
-        
-        return endJoueur or endAgent
+                    break
+
+        self.end = endJoueur or endAgent
+        print(self.end)
+        return self.end
 
 def sanityCheck(game:Game):
 
@@ -239,7 +243,7 @@ def sanityCheck(game:Game):
                 node = game.board[i]
                 break
         
-        coups = node.coupsValide()
+        coups = node.getCoupsValide()
         for coup in coups:
             game.getNode(coup.x,coup.y).value = "X"
         

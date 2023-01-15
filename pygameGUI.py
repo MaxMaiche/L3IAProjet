@@ -69,10 +69,10 @@ def draw_coupsValide(coups:set, circles:list):
                 break
 
 
-def draw_window(game,circles:list, coups:set, end:bool):
+def draw_window(game,circles:list, coups:set):
     WIN.fill((15,85,200))
     circles.clear()
-    if not end:
+    if not game.end:
         draw_board(game, circles)
         draw_coupsValide(coups, circles)
     else:
@@ -88,7 +88,6 @@ def main(game):
     circles = []
     node_actuel = None
     coups=set()
-    end = False
     while run:
 
         clock.tick(FPS)
@@ -111,7 +110,7 @@ def main(game):
                                 node = game.getNode(node_x, node_y)
                                 if node in coups:
                                     if game.turn%2 == 1:
-                                        end = game.joueur.play(node_actuel, node, game)
+                                        game.end = game.joueur.play(node_actuel, node, game)
                                         
                                     node_actuel = None
                                     coups = set()
@@ -122,10 +121,10 @@ def main(game):
                     coups = set()
 
         if game.turn%2 == 0:
-            #end = agent.randomAgent(game)
-            end = agent.greedyAgent(game)
+            #game.end = agent.randomAgent(game)
+            game.end = agent.greedyAgent(game)
 
-        draw_window(game, circles, coups, end)
+        draw_window(game, circles, coups)
 
     pygame.quit()
 
