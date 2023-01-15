@@ -92,9 +92,17 @@ def main(game):
 
         clock.tick(FPS)
 
+        if game.end:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+            draw_window(game, circles, coups)
+            continue
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+                
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 trouve = False
