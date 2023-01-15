@@ -208,7 +208,6 @@ class Game:
 
 def sanityCheck(game:Game):
 
-
     for _ in range(10):
         test= []
         for i in range(10):
@@ -239,4 +238,4 @@ def sanityCheck(game:Game):
 if __name__ == "__main__":
     g = Game()
     g.print()
-    #sanityCheck(g) 
+    sanityCheck(g) 

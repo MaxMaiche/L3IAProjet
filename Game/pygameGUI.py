@@ -104,7 +104,6 @@ def main(game):
                         if val == 1 and game.turn%2 == 1:
                             node_actuel = game.getNode(node_x, node_y)
                             coups = node_actuel.coupsValide()
-                            pygame.display.update()
                             trouve = True
                             break
                         elif val == 0 and node_actuel != None:
