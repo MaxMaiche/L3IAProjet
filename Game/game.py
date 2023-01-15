@@ -1,4 +1,5 @@
 import itertools
+import random
 
 
 class Node:
@@ -61,12 +62,12 @@ class Node:
                     nodesSaut.append(voisin.getVoisin(i))
                     coups.add(voisin.getVoisin(i))
     
-        coups = coups.union(self.getCoupsSaut(nodesSaut))
+        coups = self.getCoupsSaut(coups,nodesSaut)
+        coups.remove(self)
         return coups
     
-    def getCoupsSaut(self,nodes:list)->set:
-        coups=set()
-
+    def getCoupsSaut(self,coups,nodes:list)->set:
+        
         while len(nodes) > 0:
             node = nodes.pop()
             for i in range(6):
@@ -74,9 +75,9 @@ class Node:
                 if voisin == None:
                     continue
                 if voisin.value != 0:
-                    if voisin.getVoisin(i) != None and voisin.getVoisin(i).value == 0:
-                        nodes.append(voisin)
-                        coups.add(voisin)
+                    if voisin.getVoisin(i) != None and voisin.getVoisin(i).value == 0 and voisin.getVoisin(i) not in coups:
+                        nodes.append(voisin.getVoisin(i))
+                        coups.add(voisin.getVoisin(i))
         return coups
     
     def __str__(self):
@@ -92,23 +93,25 @@ class player:
         for pion in self.pions:
             self.coups[pion] = pion.coupsValide()
         return self.coups
+
     
-    def getCoups(self, node:Node)->set:
-        return self.coups[node]
-    
-    def play(self, node:Node, node2:Node)->None:
+    def play(self, node:Node, node2:Node,game)->bool:
         node.value = 0
         node2.value = self.value
         self.pions.remove(node)
         self.pions.add(node2)
         self.getCoups()
+        if game.isFinished():
+            return True
+        game.turn += 1
+        return False
 
 
 class Game:
     def __init__(self):
         self.end = False
         self.board = []
-
+        self.turn = 1
         self.joueur = player(1)
         self.agent = player(2)
 
@@ -152,10 +155,10 @@ class Game:
                 y+=1
                 self.getNode(x,y).score = score
             
-            
+                
+    def getBoard(self)->list:
+        return self.board
 
-        
-    
     def getNode(self, x, y) -> Node:
         if x<0 or x>8 or y<0 or y>8:
             return None
@@ -188,9 +191,52 @@ class Game:
                 chaine+= "  " + str(self.getNode(x,y).value)
             print(chaine)
             
+    def isFinished(self)->bool:
+        endAgent = True
+        for y in range(4):
+            for x in range(5+y, 9):
+                if self.getNode(x,y).value != 2:
+                    endAgent = False
+        
+        endJoueur = True
+        for x in range(4):
+            for y in range(5+x, 9):
+                if self.getNode(x,y).value != 1:
+                    endJoueur = False
+        
+        return endJoueur or endAgent
 
-g = Game()
+def sanityCheck(game:Game):
 
-for node in g.board:
-    node.value = node.score
-g.print()      
+
+    for _ in range(10):
+        test= []
+        for i in range(10):
+            test.append(1)
+        for i in range(10):
+            test.append(2)
+        for i in range(61):
+            test.append(0)
+        random.shuffle(test)
+
+        for i in range(81):
+            game.board[i].value = test[i]
+
+        node = 0
+        for i in range(81):
+            if game.board[i].value == 1:
+                node = game.board[i]
+                break
+        
+        coups = node.coupsValide()
+        for coup in coups:
+            game.getNode(coup.x,coup.y).value = "X"
+        
+        node.value = "#"
+        game.print()
+        
+
+if __name__ == "__main__":
+    g = Game()
+    g.print()
+    #sanityCheck(g) 
