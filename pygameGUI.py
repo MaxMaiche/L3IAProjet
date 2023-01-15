@@ -72,16 +72,19 @@ def draw_coupsValide(coups:set, circles:list):
 def draw_window(game,circles:list, coups:set):
     WIN.fill((15,85,200))
     circles.clear()
-    if game.end:
-        font = pygame.font.SysFont('comicsans', 100)
-        text = font.render('Fin de la partie', 1, (37,37,37))
-        WIN.blit(text, (WIDTH/2 - text.get_width()/2, HEIGHT/2 - text.get_height()/2))
 
     draw_board(game, circles)
     draw_coupsValide(coups, circles)
 
+    if game.end:
+        font = pygame.font.SysFont('comicsans', 100)
+        text = font.render('Fin de la partie', 1, (255,0,255))
+        WIN.blit(text, (WIDTH/2 - text.get_width()/2, HEIGHT/2 - text.get_height()/2))
+
     pygame.display.update()
 
+def wait(time):
+    pygame.time.wait(int(time*1000))
 
 def main(game):
     clock = pygame.time.Clock()
@@ -104,39 +107,50 @@ def main(game):
             if event.type == pygame.QUIT:
                 run = False
                 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN and game.turn%2 == 1 and game.joueur1.type == 0:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 trouve = False
                 for i, (x, y, val, node_x, node_y) in enumerate(circles):
                     if (x - mouse_x) ** 2 + (y - mouse_y) ** 2 <= 25 ** 2:
-                        if game.turn%2 == 1:
-                            if val == 1:
-                                node_actuel = game.getNode(node_x, node_y)
-                                coups = node_actuel.getCoupsValide()
+                        if val == 1:
+                            node_actuel = game.getNode(node_x, node_y)
+                            coups = node_actuel.getCoupsValide()
+                            trouve = True
+                            break
+                        elif val == 0 and node_actuel != None:
+                            node = game.getNode(node_x, node_y)
+                            if node in coups:
+                                game.end = game.joueur1.play(node_actuel, node, game)
+                                    
+                                node_actuel = None
+                                coups = set()
                                 trouve = True
                                 break
-                            elif val == 0 and node_actuel != None:
-                                node = game.getNode(node_x, node_y)
-                                if node in coups:
-                                    if game.turn%2 == 1:
-                                        game.end = game.joueur.play(node_actuel, node, game)
-                                        
-                                    node_actuel = None
-                                    coups = set()
-                                    trouve = True
-                                    break
                         
                 if not trouve:
                     coups = set()
 
+        sec = 0.1
+        if game.turn%2 == 1:
+            if game.joueur1.type == 1:
+                game.end = agent.randomAgent(game,1)
+                wait(sec)
+            if game.joueur1.type == 2:
+                game.end = agent.greedyAgent(game,1)
+                wait(sec)
+
         if game.turn%2 == 0:
-            #game.end = agent.randomAgent(game)
-            game.end = agent.greedyAgent(game)
+            if game.joueur2.type == 1:
+                game.end = agent.randomAgent(game,2)
+                wait(sec)
+            if game.joueur2.type == 2:
+                game.end = agent.greedyAgent(game,2)
+                wait(sec)
 
         draw_window(game, circles, coups)
 
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game()
+    game = game.Game(2,2) #0 = joueur, 1 = random, 2 = greedy
     main(game)

@@ -89,7 +89,8 @@ class Node:
         return "(" + str(self.x) + "," + str(self.y) + ")"
 
 class player:
-    def __init__(self, value:int):
+    def __init__(self, value:int, type):
+        self.type = type # 0 = joueur, 1 = agentRandom , 2 = agentGreedy
         self.value = value
         if value == 1:
             self.score = 20 # score de base du joueur
@@ -128,12 +129,12 @@ class player:
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, type1, type2):
         self.end = False
         self.board = []
         self.turn = 1
-        self.joueur = player(1)
-        self.agent = player(2)
+        self.joueur1 = player(1, type1)
+        self.joueur2 = player(2, type2)
 
         for x,y in itertools.product(range(9), range(9)):
             self.board.append(Node(self,x,y))
@@ -145,13 +146,13 @@ class Game:
             for x in range(5+y, 9):
                 node = self.getNode(x,y)
                 node.value = 1
-                self.joueur.pions.add(node)
+                self.joueur1.pions.add(node)
                 
         for x in range(4):
             for y in range(5+x, 9):
                 node = self.getNode(x,y)
                 node.value = 2
-                self.agent.pions.add(node)
+                self.joueur2.pions.add(node)
 
         
         for y in range(8,0,-1):
@@ -227,7 +228,6 @@ class Game:
                     break
 
         self.end = endJoueur or endAgent
-        print(self.end)
         return self.end
 
 def sanityCheck(game:Game):
