@@ -133,7 +133,7 @@ def main(game):
                 if not trouve:
                     coups = set()
 
-        sec = 0.1
+        sec = 0.0
         if game.turn%2 == 1:
             if game.joueur1.type == 1:
                 game.end = agent.randomAgent(game,1)
