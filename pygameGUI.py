@@ -5,6 +5,8 @@ from screeninfo import get_monitors
 pygame.init()
 
 HEIGHT= get_monitors()[0].height - 100
+if HEIGHT > 1000:
+    HEIGHT = 1000
 WIDTH = int(HEIGHT*0.7)-50
 #WIDTH, HEIGHT = 700, 1000
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -80,7 +82,7 @@ def draw_window(game,circles:list, coups:set):
     draw_coupsValide(coups, circles)
 
     if game.end:
-        font = pygame.font.SysFont('comicsans', 100)
+        font = pygame.font.SysFont('comicsans', 75)
         text = font.render('Fin de la partie', 1, (255,0,255))
         WIN.blit(text, (WIDTH/2 - text.get_width()/2, HEIGHT/2 - text.get_height()/2))
 
@@ -133,7 +135,7 @@ def main(game):
                 if not trouve:
                     coups = set()
 
-        sec = 0.0
+        sec = 0.1
         if game.turn%2 == 1:
             if game.joueur1.type == 1:
                 game.end = agent.randomAgent(game,1)
@@ -155,5 +157,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(0,2) #0 = joueur, 1 = random, 2 = greedy
+    game = game.Game(2,2) #0 = joueur, 1 = random, 2 = greedy
     main(game)
