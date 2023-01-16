@@ -213,21 +213,14 @@ class Game:
             print(chaine)
             
     def isFinished(self)->bool:
-        endAgent = True
-        for y in range(4):
-            for x in range(5+y, 9):
-                if self.getNode(x,y).value != 2:
-                    endAgent = False
-                    break
+        if self.joueur1.score == 140:
+            self.end == True
+            return True
         
-        endJoueur = True
-        for x in range(4):
-            for y in range(5+x, 9):
-                if self.getNode(x,y).value != 1:
-                    endJoueur = False
-                    break
+        if self.joueur2.score == 20:
+            self.end = True
+            return True
 
-        self.end = endJoueur or endAgent
         return self.end
 
 def sanityCheck(game:Game):
@@ -260,6 +253,6 @@ def sanityCheck(game:Game):
         
 
 if __name__ == "__main__":
-    g = Game()
+    g = Game(0,0)
     g.print()
     sanityCheck(g) 
