@@ -1,9 +1,12 @@
 import pygame
 import game
 import agent
+from screeninfo import get_monitors
 pygame.init()
 
-WIDTH, HEIGHT = 700, 1000
+HEIGHT= get_monitors()[0].height - 100
+WIDTH = int(HEIGHT*0.7)-50
+#WIDTH, HEIGHT = 700, 1000
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dames Chinoises")
 
@@ -152,5 +155,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(2,2) #0 = joueur, 1 = random, 2 = greedy
+    game = game.Game(0,2) #0 = joueur, 1 = random, 2 = greedy
     main(game)
