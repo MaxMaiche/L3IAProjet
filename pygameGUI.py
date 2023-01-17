@@ -117,23 +117,18 @@ def main(game):
                 trouve = False
                 for i, (x, y, val, node_x, node_y) in enumerate(circles):
                     if (x - mouse_x) ** 2 + (y - mouse_y) ** 2 <= 25 ** 2:
-                        if val == 1 and game.joueur1.type == 0 and game.turn%2 == 1:
+                        if val != 0 and game.joueurs[val-1].type == 0 and game.turn%2 == 1:
                             node_actuel = game.getNode(node_x, node_y)
                             coups = node_actuel.getCoupsValide()
                             trouve = True
                             break
-                        elif val == 2 and game.joueur2.type == 0 and game.turn%2 == 0:
-                            node_actuel = game.getNode(node_x, node_y)
-                            coups = node_actuel.getCoupsValide()
-                            trouve = True
-
                         elif val == 0 and node_actuel != None:
                             node = game.getNode(node_x, node_y)
                             if node in coups:
                                 if game.turn%2 == 1:
-                                    game.end = game.joueur1.play(node_actuel, node, game)
+                                    game.end = game.joueurs[0].play(node_actuel, node, game)
                                 elif game.turn%2 == 0:
-                                    game.end = game.joueur2.play(node_actuel, node, game)
+                                    game.end = game.joueurs[1].play(node_actuel, node, game)
                                     
                                 node_actuel = None
                                 coups = set()
@@ -145,18 +140,18 @@ def main(game):
 
         sec = 0.1
         if game.turn%2 == 1:
-            if game.joueur1.type == 1:
+            if game.joueurs[0].type == 1:
                 game.end = agent.randomAgent(game,1)
                 wait(sec)
-            if game.joueur1.type == 2:
+            if game.joueurs[0].type == 2:
                 game.end = agent.greedyAgent(game,1)
                 wait(sec)
 
         if game.turn%2 == 0:
-            if game.joueur2.type == 1:
+            if game.joueurs[1].type == 1:
                 game.end = agent.randomAgent(game,2)
                 wait(sec)
-            if game.joueur2.type == 2:
+            if game.joueurs[1].type == 2:
                 game.end = agent.greedyAgent(game,2)
                 wait(sec)
 
@@ -165,5 +160,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(2,0) #0 = joueur, 1 = random, 2 = greedy
+    game = game.Game(0,2) #0 = joueur, 1 = random, 2 = greedy
     main(game)
