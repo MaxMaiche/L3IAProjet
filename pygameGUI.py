@@ -1,6 +1,5 @@
 import pygame
 import game
-import agent
 from screeninfo import get_monitors
 pygame.init()
 
@@ -95,70 +94,41 @@ def main(game):
     clock = pygame.time.Clock()
     run = True
     circles = []
-    node_actuel = None
+    node_depart = None
     coups=set()
+    sec = 0.1
+   
     while run:
-
         clock.tick(FPS)
 
-        if game.end:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-            draw_window(game, circles, coups)
-            continue
-
+        #parcours des event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-                
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+                break
+            elif event.type == pygame.MOUSEBUTTONDOWN and game.players[1-game.turn%2].isHuman() and (not game.end):
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                trouve = False
                 for i, (x, y, val, node_x, node_y) in enumerate(circles):
                     if (x - mouse_x) ** 2 + (y - mouse_y) ** 2 <= 25 ** 2:
-                        if val != 0 and game.joueurs[val-1].type == 0 and game.turn%2 == 1:
-                            node_actuel = game.getNode(node_x, node_y)
-                            coups = node_actuel.getCoupsValide()
-                            trouve = True
-                            break
-                        elif val == 0 and node_actuel != None:
-                            node = game.getNode(node_x, node_y)
-                            if node in coups:
-                                if game.turn%2 == 1:
-                                    game.end = game.joueurs[0].play(node_actuel, node, game)
-                                elif game.turn%2 == 0:
-                                    game.end = game.joueurs[1].play(node_actuel, node, game)
-                                    
-                                node_actuel = None
-                                coups = set()
-                                trouve = True
+                        if val >= 1 and val%2 == game.turn%2: #circle has the current player's color, display targets
+                            node_depart = game.getNode(node_x, node_y)
+                            coups = node_depart.getCoupsValide()
+                        elif val == 0 and node_depart != None:
+                            node_target = game.getNode(node_x, node_y)
+                            if node_target not in coups:
                                 break
-                        
-                if not trouve:
-                    coups = set()
-
-        sec = 0.1
-        if game.turn%2 == 1:
-            if game.joueurs[0].type == 1:
-                game.end = agent.randomAgent(game,1)
+                            game.players[1-game.turn%2].play(node_depart, node_target, game)
+                            coups = set()
+                            node_depart = None
+        # agent play si besoin
+        if run and (not game.players[1-game.turn%2].isHuman()) and (not game.end) : 
+                game.players[1-game.turn%2].agentPlay(game)       
                 wait(sec)
-            if game.joueurs[0].type == 2:
-                game.end = agent.greedyAgent(game,1)
-                wait(sec)
-
-        if game.turn%2 == 0:
-            if game.joueurs[1].type == 1:
-                game.end = agent.randomAgent(game,2)
-                wait(sec)
-            if game.joueurs[1].type == 2:
-                game.end = agent.greedyAgent(game,2)
-                wait(sec)
+             
 
         draw_window(game, circles, coups)
-
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(0,2) #0 = joueur, 1 = random, 2 = greedy
+    game = game.Game(2,2) #0 = joueur, 1 = random, 2 = greedy
     main(game)

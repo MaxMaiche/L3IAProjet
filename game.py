@@ -1,6 +1,6 @@
 import itertools
 import random
-
+import agent
 
 class Node:
     def __init__(self, game, x:int, y:int):
@@ -127,15 +127,25 @@ class player:
         game.turn += 1
         return False
 
+    def isHuman(self)->bool:
+        return self.type == 0
+
+    def agentPlay(self, game)->bool:
+        if self.type == 1:
+            game.end = agent.randomAgent(game,2-game.turn%2)
+        elif self.type == 2:
+            game.end = agent.greedyAgent(game,2-game.turn%2)
+
 
 class Game:
     def __init__(self, type1, type2):
         self.end = False
         self.board = []
         self.turn = 1
-        self.joueurs = []
-        self.joueurs.append(player(1, type1))
-        self.joueurs.append(player(2, type2))
+
+        self.players = []
+        self.players.append(player(1, type1))
+        self.players.append(player(2, type2))
 
         for x,y in itertools.product(range(9), range(9)):
             self.board.append(Node(self,x,y))
@@ -147,13 +157,13 @@ class Game:
             for x in range(5+y, 9):
                 node = self.getNode(x,y)
                 node.value = 1
-                self.joueurs[0].pions.add(node)
-                
+                self.players[0].pions.add(node)
+ 
         for x in range(4):
             for y in range(5+x, 9):
                 node = self.getNode(x,y)
                 node.value = 2
-                self.joueurs[1].pions.add(node)
+                self.players[1].pions.add(node)
 
         
         for y in range(8,0,-1):
@@ -214,11 +224,11 @@ class Game:
             print(chaine)
             
     def isFinished(self)->bool:
-        if self.joueurs[0].score == 140:
+        if self.players[0].score == 140:
             self.end == True
             return True
         
-        if self.joueurs[1].score == 20:
+        if self.players[1].score == 20:
             self.end = True
             return True
 
@@ -254,6 +264,6 @@ def sanityCheck(game:Game):
         
 
 if __name__ == "__main__":
-    g = Game(0,0)
+    g = Game(0,1)
     g.print()
     sanityCheck(g) 

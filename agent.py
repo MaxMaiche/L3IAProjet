@@ -1,5 +1,4 @@
 import game
-import pygameGUI
 import random
 
 def randomAgent(game:game, value):
@@ -29,8 +28,8 @@ def greedyAgent(game:game,value):
     coups = dict()
     move = ()
     b = False
-
-    coups = game.joueurs[value-1].getCoups()
+ 
+    coups = game.players[value-1].getCoups()
     list = []
     for key in coups:
         for v in coups[key]:
@@ -42,13 +41,11 @@ def greedyAgent(game:game,value):
         node2 = list[i][1].score
         listscore.append((node1 - node2, list[i]))
             
-    random.shuffle(listscore) 
-    
-    if value == 1:
-        move = min(listscore,key=lambda item:item[0])[1]
-    else:
+    random.shuffle(listscore)    
+    if (value == 2): 
         move = max(listscore,key=lambda item:item[0])[1]
+    else:
+        move = min(listscore,key=lambda item:item[0])[1]
 
-    b = game.joueurs[value-1].play(move[0],move[1],game) 
-
+    b = game.players[value-1].play(move[0],move[1],game)
     return b
