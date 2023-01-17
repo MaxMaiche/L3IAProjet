@@ -112,20 +112,28 @@ def main(game):
             if event.type == pygame.QUIT:
                 run = False
                 
-            elif event.type == pygame.MOUSEBUTTONDOWN and game.turn%2 == 1 and game.joueur1.type == 0:
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 trouve = False
                 for i, (x, y, val, node_x, node_y) in enumerate(circles):
                     if (x - mouse_x) ** 2 + (y - mouse_y) ** 2 <= 25 ** 2:
-                        if val == 1:
+                        if val == 1 and game.joueur1.type == 0 and game.turn%2 == 1:
                             node_actuel = game.getNode(node_x, node_y)
                             coups = node_actuel.getCoupsValide()
                             trouve = True
                             break
+                        elif val == 2 and game.joueur2.type == 0 and game.turn%2 == 0:
+                            node_actuel = game.getNode(node_x, node_y)
+                            coups = node_actuel.getCoupsValide()
+                            trouve = True
+
                         elif val == 0 and node_actuel != None:
                             node = game.getNode(node_x, node_y)
                             if node in coups:
-                                game.end = game.joueur1.play(node_actuel, node, game)
+                                if game.turn%2 == 1:
+                                    game.end = game.joueur1.play(node_actuel, node, game)
+                                elif game.turn%2 == 0:
+                                    game.end = game.joueur2.play(node_actuel, node, game)
                                     
                                 node_actuel = None
                                 coups = set()
@@ -157,5 +165,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(2,2) #0 = joueur, 1 = random, 2 = greedy
+    game = game.Game(2,0) #0 = joueur, 1 = random, 2 = greedy
     main(game)
