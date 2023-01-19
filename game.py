@@ -132,14 +132,15 @@ class player:
 
     def agentPlay(self, game)->bool:
         if self.type == 1:
-            game.end = agent.randomAgent(game,2-game.turn%2)
+            game.end = agent.randomAgent(game, self.value)
         elif self.type == 2:
-            game.end = agent.greedyAgent(game,2-game.turn%2)
+            game.end = agent.greedyAgent(game, self.value)
 
 
 class Game:
     def __init__(self, type1, type2):
         self.end = False
+        self.draw = False
         self.board = []
         self.turn = 1
 
@@ -224,6 +225,10 @@ class Game:
             print(chaine)
             
     def isFinished(self)->bool:
+        if self.turn == 500:
+            self.end = True
+            self.draw = True
+            return True
         if self.players[0].score == 140:
             self.end == True
             return True
@@ -262,8 +267,26 @@ def sanityCheck(game:Game):
         node.value = "#"
         game.print()
         
+    
+def winrateCheck(agent1, agent2, nbGame:int):
+    winrate = 0
+    drawcount = 0
+    for i in range(nbGame):
+        g = Game(agent1, agent2)
+        while not g.isFinished():
+            g.players[(g.turn-1)%2].agentPlay(g)
+        if g.draw:
+            drawcount += 1
+            continue
+        if g.players[0].score == 140 :
+            winrate += 1
+    print("winrate : " + str(winrate/nbGame * 100) + "%")
+    print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 if __name__ == "__main__":
+    """
     g = Game(0,1)
     g.print()
     sanityCheck(g) 
+    """
+    winrateCheck(1,2,10000)

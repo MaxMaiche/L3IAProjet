@@ -4,11 +4,8 @@ import random
 def randomAgent(game:game, value):
     coups = dict()
     move = ()
-    if value == 1:
-        coups = game.joueur1.getCoups()
-    else:
-        coups = game.joueur2.getCoups()
-
+    
+    coups = game.players[value-1].getCoups()
 
     list = []
     for key in coups:
@@ -17,10 +14,9 @@ def randomAgent(game:game, value):
     
     move = random.choice(list)
     b=False
-    if value == 1:
-        b = game.joueur1.play(move[0],move[1],game)
-    else:
-        b = game.joueur2.play(move[0],move[1],game)
+
+ 
+    b = game.players[value-1].play(move[0],move[1],game)
 
     return b
 
