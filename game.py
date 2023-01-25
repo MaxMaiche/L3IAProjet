@@ -1,7 +1,8 @@
 import itertools
 import random
 import agent
-
+import sys
+sys.setrecursionlimit(100000)
 class Node:
     def __init__(self, game, x:int, y:int):
         self.game = game
@@ -135,6 +136,8 @@ class player:
             game.end = agent.randomAgent(game,2-game.turn%2)
         elif self.type == 2:
             game.end = agent.greedyAgent(game,2-game.turn%2)
+        elif self.type == 3:
+            game.end = agent.minimaxAgent(game,2-game.turn%2)
 
 
 class Game:

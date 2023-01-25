@@ -1,5 +1,6 @@
 import game
 import random
+from copy import deepcopy
 
 def randomAgent(game:game, value):
     coups = dict()
@@ -49,3 +50,70 @@ def greedyAgent(game:game,value):
 
     b = game.players[value-1].play(move[0],move[1],game)
     return b
+
+
+
+def minimaxAgent(game:game,value):
+    gameCopy = deepcopy(game)
+    value=value-1
+    coups = gameCopy.players[value].getCoups()
+    
+    list = []
+    for key in coups:
+        for v in coups[key]:
+            list.append((key,v))
+            
+    values = []
+    for coup in list:
+        gameCopy2 = deepcopy(gameCopy)
+        depart = gameCopy2.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy2.getNode(coup[1].x,coup[1].y)
+        gameCopy2.players[value].play(depart, arrive, gameCopy2)
+        values.append((coup,min_value(gameCopy2, value)))
+    
+    move = max(values,key=lambda item:item[1])[0]
+    b= game.players[value].play(move[0],move[1],game)
+    return b
+    
+def min_value(game:game,value):
+    if game.isFinished():
+        return 1
+
+    value = 1-value
+    coups = game.players[value].getCoups()
+    
+    list = []
+    for key in coups:
+        for v in coups[key]:
+            list.append((key,v))
+            
+    values = []
+    for coup in list:
+        gameCopy = deepcopy(game)
+        depart = gameCopy.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
+        gameCopy.players[value].play(depart, arrive, gameCopy)
+        values.append(max_value(gameCopy, value))
+    return min(values)  
+
+
+def max_value(game:game,value):
+    if game.isFinished():
+        return -1
+        
+    value = 1-value
+    coups = game.players[value].getCoups()
+    
+    list = []
+    for key in coups:
+        for v in coups[key]:
+            list.append((key,v))
+            
+    values = []
+    for coup in list:
+        gameCopy = deepcopy(game)
+        depart = gameCopy.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
+        gameCopy.players[value].play(depart, arrive, gameCopy)
+        values.append(min_value(gameCopy, value))
+    return max(values)
