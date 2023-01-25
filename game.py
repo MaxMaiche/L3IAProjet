@@ -138,7 +138,8 @@ class player:
             game.end = agent.greedyAgent(game,2-game.turn%2)
         elif self.type == 3:
             game.end = agent.minimaxAgent(game,2-game.turn%2,2)
-
+        elif self.type == 4:
+            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,2)
 
 
 class Game:
@@ -301,4 +302,4 @@ if __name__ == "__main__":
     g.print()
     sanityCheck(g) 
     """
-    winrateCheck(1,2,10000)
+    winrateCheck(4,2,10)

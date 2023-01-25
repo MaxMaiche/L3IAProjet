@@ -130,5 +130,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(2,3) #0 = joueur, 1 = random, 2 = greedy
+    game = game.Game(2,4) #0 = joueur, 1 = random, 2 = greedy,3 = minimax
     main(game)

@@ -2,6 +2,10 @@ import game
 import random
 from copy import deepcopy
 
+MAX_VALUE = 1_000_000
+MIN_VALUE = -1_000_000
+
+
 def randomAgent(game:game, value):
     coups = dict()
     move = ()
@@ -125,13 +129,36 @@ def max_value(game:game,value, nbProfondeur):
 
 
 
-def alpha_Beta_Agent(game,value):
+def alpha_Beta_Agent(game,value,nbProfondeur):
+
+    alpha = MIN_VALUE
+    beta = MAX_VALUE
     gameCopy = deepcopy(game)
     value=value-1
+    coups = gameCopy.players[value].getCoups()
     
-def min_valueAB(game:game,value, nbProfondeur):
+    list = []
+    for key in coups:
+        for v in coups[key]:
+            list.append((key,v))
+            
+    values = []
+    for coup in list:
+        gameCopy2 = deepcopy(gameCopy)
+        depart = gameCopy2.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy2.getNode(coup[1].x,coup[1].y)
+        gameCopy2.players[value].play(depart, arrive, gameCopy2)
+        values.append((coup,min_valueAB(gameCopy2, value, nbProfondeur, alpha, beta)))
+    
+    move = max(values,key=lambda item:item[1])[0]
+    depart = game.getNode(move[0].x,move[0].y)
+    arrive = game.getNode(move[1].x,move[1].y)
+    b= game.players[value].play(depart,arrive,game)
+    return b
+    
+def min_valueAB(game:game,value, nbProfondeur, alpha, beta):
     if game.isFinished():
-        return 1_000_000
+        return MAX_VALUE
     
     value = 1-value
     nbProfondeur-=1
@@ -144,20 +171,23 @@ def min_valueAB(game:game,value, nbProfondeur):
     for key in coups:
         for v in coups[key]:
             list.append((key,v))
-            
-    values = []
+    
+    val = MAX_VALUE
     for coup in list:
         gameCopy = deepcopy(game)
         depart = gameCopy.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
         gameCopy.players[value].play(depart, arrive, gameCopy)
-        values.append(max_value(gameCopy, value,nbProfondeur))
-    return min(values)  
+        val = min(val,max_valueAB(gameCopy, value,nbProfondeur, alpha, beta))
+        if val <= alpha:
+            return val
+        beta = min(beta, val)
+    return val  
 
 
-def max_valueAB(game:game,value, nbProfondeur):
+def max_valueAB(game:game,value, nbProfondeur, alpha, beta):
     if game.isFinished():
-        return -1_000_000
+        return MIN_VALUE
     
     value = 1-value
     nbProfondeur-=1
@@ -172,11 +202,14 @@ def max_valueAB(game:game,value, nbProfondeur):
         for v in coups[key]:
             list.append((key,v))
             
-    values = []
+    val = MIN_VALUE
     for coup in list:
         gameCopy = deepcopy(game)
         depart = gameCopy.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
         gameCopy.players[value].play(depart, arrive, gameCopy)
-        values.append(min_value(gameCopy, value, nbProfondeur))
-    return max(values)
+        val = max(val,min_valueAB(gameCopy, value, nbProfondeur, alpha, beta))
+        if val >= beta:
+            return val
+        alpha = max(alpha, val)
+    return val
