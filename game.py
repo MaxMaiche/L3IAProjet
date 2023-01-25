@@ -1,7 +1,10 @@
+from copy import deepcopy
 import itertools
 import random
 import agent
 import sys
+import cProfile	
+
 sys.setrecursionlimit(100000)
 class Node:
     def __init__(self, game, x:int, y:int):
@@ -127,6 +130,20 @@ class player:
             return True
         game.turn += 1
         return False
+
+    def undo(self, node:Node, node2:Node,game)->None:
+        node2.value = 0
+        node.value = self.value
+
+        score = node2.score - node.score
+        self.score += score
+
+        self.pions.remove(node2)
+        self.pions.add(node)
+        self.getCoups()
+
+        game.turn -= 1
+ 
 
     def isHuman(self)->bool:
         return self.type == 0
@@ -296,10 +313,17 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("winrate : " + str(winrate/nbGame * 100) + "%")
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
+def main():
+    winrateCheck(2,4,1)
+
+
+
+
 if __name__ == "__main__":
     """
     g = Game(0,1)
     g.print()
     sanityCheck(g) 
     """
-    winrateCheck(4,2,10)
+    cProfile.run('test()')
+

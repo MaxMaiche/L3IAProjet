@@ -42,7 +42,7 @@ def greedyAgent(game:game,value):
         node2 = list[i][1].score
         listscore.append((node1 - node2, list[i]))
             
-    random.shuffle(listscore)    
+    random.shuffle(listscore)
     if (value == 2): 
         move = max(listscore,key=lambda item:item[0])[1]
     else:
@@ -127,7 +127,16 @@ def max_value(game:game,value, nbProfondeur):
         values.append(min_value(gameCopy, value, nbProfondeur))
     return max(values)
 
-
+def listecoutcoup(liste, value):
+    listecout = []
+    for i in range(len(liste)):
+        node1 = liste[i][0].score
+        node2 = liste[i][1].score
+        if value == 0:
+            listecout.append((node2 - node1, liste[i]))
+        else:
+            listecout.append((node1 - node2, liste[i]))
+    return listecout
 
 def alpha_Beta_Agent(game,value,nbProfondeur):
 
@@ -141,7 +150,10 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
     for key in coups:
         for v in coups[key]:
             list.append((key,v))
-            
+    
+    couts=listecoutcoup(list,value)
+    list = [x for _, x in sorted(zip(couts, list),reverse=True)]
+
     values = []
     for coup in list:
         gameCopy2 = deepcopy(gameCopy)
@@ -172,6 +184,9 @@ def min_valueAB(game:game,value, nbProfondeur, alpha, beta):
         for v in coups[key]:
             list.append((key,v))
     
+    couts=listecoutcoup(list,value)
+    list = [x for _, x in sorted(zip(couts, list),reverse=True)]
+
     val = MAX_VALUE
     for coup in list:
         gameCopy = deepcopy(game)
@@ -201,6 +216,9 @@ def max_valueAB(game:game,value, nbProfondeur, alpha, beta):
     for key in coups:
         for v in coups[key]:
             list.append((key,v))
+
+    couts=listecoutcoup(list,value)
+    list = [x for _, x in sorted(zip(couts, list),reverse=True)]
             
     val = MIN_VALUE
     for coup in list:

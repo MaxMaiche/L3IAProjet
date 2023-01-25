@@ -118,7 +118,7 @@ def main(game):
                             if node_target not in coups:
                                 break
                             game.players[1-game.turn%2].play(node_depart, node_target, game)
-                            scoups = set()
+                            coups = set()
                             node_depart = None
         # agent play si besoin
         if run and (not game.players[1-game.turn%2].isHuman()) and (not game.end) : 
@@ -130,5 +130,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(2,4) #0 = joueur, 1 = random, 2 = greedy,3 = minimax
+    game = game.Game(0,4) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4 = alphabeta
     main(game)
