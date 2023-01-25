@@ -118,7 +118,7 @@ def main(game):
                             if node_target not in coups:
                                 break
                             game.players[1-game.turn%2].play(node_depart, node_target, game)
-                            coups = set()
+                            scoups = set()
                             node_depart = None
         # agent play si besoin
         if run and (not game.players[1-game.turn%2].isHuman()) and (not game.end) : 

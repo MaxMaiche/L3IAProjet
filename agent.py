@@ -49,7 +49,7 @@ def greedyAgent(game:game,value):
 
 
 
-def minimaxAgent(game:game,value):
+def minimaxAgent(game:game,value, nbProfondeur):
     gameCopy = deepcopy(game)
     value=value-1
     coups = gameCopy.players[value].getCoups()
@@ -65,16 +65,21 @@ def minimaxAgent(game:game,value):
         depart = gameCopy2.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy2.getNode(coup[1].x,coup[1].y)
         gameCopy2.players[value].play(depart, arrive, gameCopy2)
-        values.append((coup,min_value(gameCopy2, value)))
+        values.append((coup,min_value(gameCopy2, value, nbProfondeur)))
     
     move = max(values,key=lambda item:item[1])[0]
-    b= game.players[value].play(move[0],move[1],game)
+    depart = game.getNode(move[0].x,move[0].y)
+    arrive = game.getNode(move[1].x,move[1].y)
+    b= game.players[value].play(depart,arrive,game)
     return b
     
-def min_value(game:game,value):
+def min_value(game:game,value, nbProfondeur):
     if game.isFinished():
         return 1
-
+    
+    nbProfondeur-=1
+    if nbProfondeur==0:
+        return 0
     value = 1-value
     coups = game.players[value].getCoups()
     
@@ -89,14 +94,18 @@ def min_value(game:game,value):
         depart = gameCopy.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
         gameCopy.players[value].play(depart, arrive, gameCopy)
-        values.append(max_value(gameCopy, value))
+        values.append(max_value(gameCopy, value,nbProfondeur))
     return min(values)  
 
 
-def max_value(game:game,value):
+def max_value(game:game,value, nbProfondeur):
     if game.isFinished():
         return -1
-        
+    
+    nbProfondeur-=1
+    if nbProfondeur==0:
+        return 0
+    
     value = 1-value
     coups = game.players[value].getCoups()
     
@@ -111,5 +120,63 @@ def max_value(game:game,value):
         depart = gameCopy.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
         gameCopy.players[value].play(depart, arrive, gameCopy)
-        values.append(min_value(gameCopy, value))
+        values.append(min_value(gameCopy, value, nbProfondeur))
+    return max(values)
+
+
+
+def alpha_Beta_Agent(game,value):
+    gameCopy = deepcopy(game)
+    value=value-1
+    
+def min_valueAB(game:game,value, nbProfondeur):
+    if game.isFinished():
+        return 1_000_000
+    
+    value = 1-value
+    nbProfondeur-=1
+    if nbProfondeur==0:
+        return game.eval(1-value)
+   
+    coups = game.players[value].getCoups()
+    
+    list = []
+    for key in coups:
+        for v in coups[key]:
+            list.append((key,v))
+            
+    values = []
+    for coup in list:
+        gameCopy = deepcopy(game)
+        depart = gameCopy.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
+        gameCopy.players[value].play(depart, arrive, gameCopy)
+        values.append(max_value(gameCopy, value,nbProfondeur))
+    return min(values)  
+
+
+def max_valueAB(game:game,value, nbProfondeur):
+    if game.isFinished():
+        return -1_000_000
+    
+    value = 1-value
+    nbProfondeur-=1
+    if nbProfondeur==0:
+        return game.eval(value)
+    
+
+    coups = game.players[value].getCoups()
+    
+    list = []
+    for key in coups:
+        for v in coups[key]:
+            list.append((key,v))
+            
+    values = []
+    for coup in list:
+        gameCopy = deepcopy(game)
+        depart = gameCopy.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
+        gameCopy.players[value].play(depart, arrive, gameCopy)
+        values.append(min_value(gameCopy, value, nbProfondeur))
     return max(values)

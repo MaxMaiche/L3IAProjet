@@ -137,7 +137,7 @@ class player:
         elif self.type == 2:
             game.end = agent.greedyAgent(game,2-game.turn%2)
         elif self.type == 3:
-            game.end = agent.minimaxAgent(game,2-game.turn%2)
+            game.end = agent.minimaxAgent(game,2-game.turn%2,2)
 
 
 
@@ -242,6 +242,14 @@ class Game:
             return True
 
         return self.end
+    
+    def eval(self, value):
+        score = 0
+        if value == 0:
+            score = self.players[0].score - (140-self.players[1].score)
+        else:
+            score = (140-self.players[1].score) - self.players[0].score
+        return score 
 
 def sanityCheck(game:Game):
 
