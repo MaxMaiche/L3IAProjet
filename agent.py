@@ -127,41 +127,29 @@ def max_value(game:game,value, nbProfondeur):
         values.append(min_value(gameCopy, value, nbProfondeur))
     return max(values)
 
-def listecoutcoup(liste, value):
-    listecout = []
-    for i in range(len(liste)):
-        node1 = liste[i][0].score
-        node2 = liste[i][1].score
-        if value == 0:
-            listecout.append((node2 - node1, liste[i]))
-        else:
-            listecout.append((node1 - node2, liste[i]))
-    return listecout
 
 def alpha_Beta_Agent(game,value,nbProfondeur):
 
     alpha = MIN_VALUE
     beta = MAX_VALUE
+
     gameCopy = deepcopy(game)
     value=value-1
-    coups = gameCopy.players[value].getCoups()
-    
-    list = []
-    for key in coups:
-        for v in coups[key]:
-            list.append((key,v))
-    
-    couts=listecoutcoup(list,value)
-    list = [x for _, x in sorted(zip(couts, list),reverse=True)]
+    coups = gameCopy.players[value].getCoupsList()
 
     values = []
-    for coup in list:
-        gameCopy2 = deepcopy(gameCopy)
-        depart = gameCopy2.getNode(coup[0].x,coup[0].y)
-        arrive = gameCopy2.getNode(coup[1].x,coup[1].y)
-        gameCopy2.players[value].play(depart, arrive, gameCopy2)
-        values.append((coup,min_valueAB(gameCopy2, value, nbProfondeur, alpha, beta)))
+    for coup in coups:
+
+        depart = gameCopy.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
+
+        gameCopy.players[value].play(depart, arrive, gameCopy)
+
+        values.append((coup,min_valueAB(gameCopy, 1-value, nbProfondeur-1, alpha, beta)))
+
+        gameCopy.players[value].undo(depart, arrive, gameCopy)
     
+    print(gameCopy.players[0].score,gameCopy.players[1].score)
     move = max(values,key=lambda item:item[1])[0]
     depart = game.getNode(move[0].x,move[0].y)
     arrive = game.getNode(move[1].x,move[1].y)
@@ -172,28 +160,21 @@ def min_valueAB(game:game,value, nbProfondeur, alpha, beta):
     if game.isFinished():
         return MAX_VALUE
     
-    value = 1-value
-    nbProfondeur-=1
+
     if nbProfondeur==0:
         return game.eval(1-value)
    
-    coups = game.players[value].getCoups()
+    coups = game.players[value].getCoupsList()
     
-    list = []
-    for key in coups:
-        for v in coups[key]:
-            list.append((key,v))
-    
-    couts=listecoutcoup(list,value)
-    list = [x for _, x in sorted(zip(couts, list),reverse=True)]
 
     val = MAX_VALUE
-    for coup in list:
-        gameCopy = deepcopy(game)
-        depart = gameCopy.getNode(coup[0].x,coup[0].y)
-        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
-        gameCopy.players[value].play(depart, arrive, gameCopy)
-        val = min(val,max_valueAB(gameCopy, value,nbProfondeur, alpha, beta))
+    for coup in coups:
+
+        depart = game.getNode(coup[0].x,coup[0].y)
+        arrive = game.getNode(coup[1].x,coup[1].y)
+        game.players[value].play(depart, arrive, game)
+        val = min(val,max_valueAB(game, 1-value, nbProfondeur-1, alpha, beta))
+        game.players[value].undo(depart, arrive, game)
         if val <= alpha:
             return val
         beta = min(beta, val)
@@ -204,30 +185,23 @@ def max_valueAB(game:game,value, nbProfondeur, alpha, beta):
     if game.isFinished():
         return MIN_VALUE
     
-    value = 1-value
-    nbProfondeur-=1
     if nbProfondeur==0:
         return game.eval(value)
     
 
-    coups = game.players[value].getCoups()
-    
-    list = []
-    for key in coups:
-        for v in coups[key]:
-            list.append((key,v))
+    coups = game.players[value].getCoupsList()
 
-    couts=listecoutcoup(list,value)
-    list = [x for _, x in sorted(zip(couts, list),reverse=True)]
             
     val = MIN_VALUE
-    for coup in list:
-        gameCopy = deepcopy(game)
-        depart = gameCopy.getNode(coup[0].x,coup[0].y)
-        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
-        gameCopy.players[value].play(depart, arrive, gameCopy)
-        val = max(val,min_valueAB(gameCopy, value, nbProfondeur, alpha, beta))
+    for coup in coups:
+
+        depart = game.getNode(coup[0].x,coup[0].y)
+        arrive = game.getNode(coup[1].x,coup[1].y)
+        game.players[value].play(depart, arrive, game)
+        val = max(val,min_valueAB(game, 1-value, nbProfondeur-1, alpha, beta))
+        game.players[value].undo(depart, arrive, game)
         if val >= beta:
             return val
         alpha = max(alpha, val)
     return val
+

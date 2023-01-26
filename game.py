@@ -109,11 +109,14 @@ class player:
             self.coups[pion] = pion.getCoupsValide()
         return self.coups
     
-    def getCoupsScore(self)->dict:
-        self.coups.clear()
-        for pion in self.pions:
-            self.coups[pion] = pion.getCoupsScore()
-        return self.coups
+    def getCoupsList(self)->list:
+        coups = self.getCoups()
+        
+        list = []
+        for key in coups:
+            for v in coups[key]:
+                list.append((key,v))
+        return list
 
     
     def play(self, node:Node, node2:Node,game)->bool:
@@ -125,7 +128,7 @@ class player:
 
         self.pions.remove(node)
         self.pions.add(node2)
-        self.getCoups()
+
         if game.isFinished():
             return True
         game.turn += 1
@@ -135,12 +138,11 @@ class player:
         node2.value = 0
         node.value = self.value
 
-        score = node2.score - node.score
+        score = node.score - node2.score
         self.score += score
 
         self.pions.remove(node2)
         self.pions.add(node)
-        self.getCoups()
 
         game.turn -= 1
  
@@ -156,7 +158,7 @@ class player:
         elif self.type == 3:
             game.end = agent.minimaxAgent(game,2-game.turn%2,2)
         elif self.type == 4:
-            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,2)
+            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,3)
 
 
 class Game:
@@ -267,7 +269,20 @@ class Game:
             score = self.players[0].score - (140-self.players[1].score)
         else:
             score = (140-self.players[1].score) - self.players[0].score
-        return score 
+        return score
+
+    def hash (self)->int:
+        h = 0
+        for node in self.board:
+            if node.value == 1:
+                h += node.x*11 + node.y*97
+            elif node.value == 2:
+                h += node.x*13 + node.y*101
+        
+        if self.turn%2 == 0:
+            h=-h
+
+        return h 
 
 def sanityCheck(game:Game):
 
@@ -325,5 +340,5 @@ if __name__ == "__main__":
     g.print()
     sanityCheck(g) 
     """
-    cProfile.run('test()')
+    cProfile.run('main()')
 
