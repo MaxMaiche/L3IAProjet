@@ -122,13 +122,13 @@ def main(game):
                             node_depart = None
         # agent play si besoin
         if run and (not game.players[1-game.turn%2].isHuman()) and (not game.end) : 
-                game.players[1-game.turn%2].agentPlay(game)       
-                wait(sec)
+            game.players[1-game.turn%2].agentPlay(game)       
+            wait(sec)
              
 
         draw_window(game, circles, coups)
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(2,4) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4 = alphabeta
+    game = game.Game(4,4) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4 = alphabeta
     main(game)

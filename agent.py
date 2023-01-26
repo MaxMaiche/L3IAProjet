@@ -134,6 +134,7 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
     beta = MAX_VALUE
 
     gameCopy = deepcopy(game)
+
     value=value-1
     coups = gameCopy.players[value].getCoupsList()
 
@@ -149,19 +150,18 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
 
         gameCopy.players[value].undo(depart, arrive, gameCopy)
     
-    print(gameCopy.players[0].score,gameCopy.players[1].score)
     move = max(values,key=lambda item:item[1])[0]
     depart = game.getNode(move[0].x,move[0].y)
     arrive = game.getNode(move[1].x,move[1].y)
     b= game.players[value].play(depart,arrive,game)
+
     return b
     
 def min_valueAB(game:game,value, nbProfondeur, alpha, beta):
-    if game.isFinished():
-        return MAX_VALUE
+    #if game.isFinished():
+    #    return MAX_VALUE
     
-
-    if nbProfondeur==0:
+    if nbProfondeur==0 or game.isFinished():
         return game.eval(1-value)
    
     coups = game.players[value].getCoupsList()
@@ -172,9 +172,13 @@ def min_valueAB(game:game,value, nbProfondeur, alpha, beta):
 
         depart = game.getNode(coup[0].x,coup[0].y)
         arrive = game.getNode(coup[1].x,coup[1].y)
+
         game.players[value].play(depart, arrive, game)
+
         val = min(val,max_valueAB(game, 1-value, nbProfondeur-1, alpha, beta))
+
         game.players[value].undo(depart, arrive, game)
+
         if val <= alpha:
             return val
         beta = min(beta, val)
@@ -182,10 +186,10 @@ def min_valueAB(game:game,value, nbProfondeur, alpha, beta):
 
 
 def max_valueAB(game:game,value, nbProfondeur, alpha, beta):
-    if game.isFinished():
-        return MIN_VALUE
+    #if game.isFinished():
+    #    return MIN_VALUE
     
-    if nbProfondeur==0:
+    if nbProfondeur==0 or game.isFinished():
         return game.eval(value)
     
 

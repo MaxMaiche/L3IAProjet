@@ -158,7 +158,7 @@ class player:
         elif self.type == 3:
             game.end = agent.minimaxAgent(game,2-game.turn%2,2)
         elif self.type == 4:
-            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,3)
+            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,2)
 
 
 class Game:
@@ -253,8 +253,9 @@ class Game:
             self.end = True
             self.draw = True
             return True
+
         if self.players[0].score == 140:
-            self.end == True
+            self.end = True
             return True
         
         if self.players[1].score == 20:
@@ -265,10 +266,16 @@ class Game:
     
     def eval(self, value):
         score = 0
+        p1Score = self.players[0].score
+        p2Score = 140 - self.players[1].score
+        finBonus = 0
+        if self.end:
+            finBonus = 1000
+
         if value == 0:
-            score = self.players[0].score - (140-self.players[1].score)
+            score = p1Score - p2Score + finBonus
         else:
-            score = (140-self.players[1].score) - self.players[0].score
+            score = p2Score - p1Score + finBonus
         return score
 
     def hash (self)->int:
@@ -329,7 +336,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(2,4,1)
+    winrateCheck(4,4,10)
 
 
 
@@ -341,4 +348,5 @@ if __name__ == "__main__":
     sanityCheck(g) 
     """
     cProfile.run('main()')
+    
 
