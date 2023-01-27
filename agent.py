@@ -128,6 +128,15 @@ def max_value(game:game,value, nbProfondeur):
     return max(values)
 
 
+def calculListScore(list):
+    listscore = []
+    for i in range(len(list)):
+        node1 = list[i][0].score
+        node2 = list[i][1].score
+        listscore.append(node1 - node2)
+    return listscore
+
+
 def alpha_Beta_Agent(game,value,nbProfondeur):
 
     alpha = MIN_VALUE
@@ -145,6 +154,9 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
 
         gameCopy.players[value].play(depart, arrive, gameCopy)
+
+        if gameCopy.split():
+            values.append((coup,max_valueAB_end(gameCopy, value, nbProfondeur-1, alpha, beta)))
 
         values.append((coup,min_valueAB(gameCopy, 1-value, nbProfondeur-1, alpha, beta)))
 
@@ -209,3 +221,26 @@ def max_valueAB(game:game,value, nbProfondeur, alpha, beta):
         alpha = max(alpha, val)
     return val
 
+
+
+def max_valueAB_end(game:game,value, nbProfondeur, alpha, beta):
+    if nbProfondeur==0 or game.isFinished():
+        return game.eval(value)
+    
+    coups = game.players[value].getCoupsList()
+    
+    val = MIN_VALUE
+
+    for coup in coups:
+
+        depart = game.getNode(coup[0].x,coup[0].y)
+        arrive = game.getNode(coup[1].x,coup[1].y)
+
+        game.players[value].play(depart, arrive, game)
+        val = max(val,max_valueAB_end(game, value, nbProfondeur-1, alpha, beta))
+        game.players[value].undo(depart, arrive, game)
+
+        if val >= beta:
+            return val
+        alpha = max(alpha, val)
+    return val

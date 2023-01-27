@@ -96,7 +96,7 @@ def main(game):
     circles = []
     node_depart = None
     coups=set()
-    sec = 0.0
+    sec = 0.1
    
     while run:
         clock.tick(FPS)

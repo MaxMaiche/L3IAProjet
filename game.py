@@ -278,6 +278,32 @@ class Game:
             score = p2Score - p1Score + finBonus
         return score
 
+    def split(self)->bool:
+
+        minP1 = 1000
+        minP2 = 1000
+        maxP1 = -1000
+        maxP2 = -1000
+
+        for pion in self.players[0].pions:
+            if pion.score < minP1:
+                minP1 = pion.score
+            #if pion.score > maxP1:
+            #    maxP1 = pion.score
+        
+        for pion in self.players[1].pions:
+            #if pion.score < minP2:
+            #    minP2 = pion.score
+            if pion.score > maxP2:
+                maxP2 = pion.score
+        
+        #if maxP1+2 < minP2:
+        #    return True
+        if maxP2+2 < minP1:
+            return True
+        else:
+            return False
+
     def hash (self)->int:
         h = 0
         for node in self.board:
@@ -329,9 +355,13 @@ def winrateCheck(agent1, agent2, nbGame:int):
             g.players[(g.turn-1)%2].agentPlay(g)
         if g.draw:
             drawcount += 1
+            print("game " + str(i) + " finished Draw")
             continue
         if g.players[0].score == 140 :
             winrate += 1
+            print("game " + str(i) + " finished Win")
+        else:
+            print("game " + str(i) + " finished Lose")
     print("winrate : " + str(winrate/nbGame * 100) + "%")
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
