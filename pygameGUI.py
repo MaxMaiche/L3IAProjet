@@ -96,7 +96,7 @@ def main(game):
     circles = []
     node_depart = None
     coups=set()
-    sec = 0.1
+    sec = 0.0
    
     while run:
         clock.tick(FPS)
@@ -130,5 +130,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(4,4) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4 = alphabeta
+    game = game.Game(4,6) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4+n = alphabeta + profondeur (4=1, 5=2, 6=3 etc)
     main(game)

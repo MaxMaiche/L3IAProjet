@@ -143,6 +143,7 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
     beta = MAX_VALUE
 
     gameCopy = deepcopy(game)
+    
 
     value=value-1
     coups = gameCopy.players[value].getCoupsList()

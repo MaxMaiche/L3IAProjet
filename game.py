@@ -145,7 +145,6 @@ class player:
         self.pions.add(node)
 
         game.turn -= 1
- 
 
     def isHuman(self)->bool:
         return self.type == 0
@@ -157,8 +156,9 @@ class player:
             game.end = agent.greedyAgent(game,2-game.turn%2)
         elif self.type == 3:
             game.end = agent.minimaxAgent(game,2-game.turn%2,2)
-        elif self.type == 4:
-            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,2)
+        elif self.type >= 4:
+            profondeur = self.type - 3
+            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,profondeur)
 
 
 class Game:
@@ -252,15 +252,12 @@ class Game:
         if self.turn == 500:
             self.end = True
             self.draw = True
-            return True
-
+        
         if self.players[0].score == 140:
             self.end = True
-            return True
         
         if self.players[1].score == 20:
             self.end = True
-            return True
 
         return self.end
     
@@ -270,7 +267,7 @@ class Game:
         p2Score = 140 - self.players[1].score
         finBonus = 0
         if self.end:
-            finBonus = 1000
+            finBonus = 10000000
 
         if value == 0:
             score = p1Score - p2Score + finBonus
@@ -366,7 +363,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(4,4,10)
+    winrateCheck(2,2,1000)
 
 
 
