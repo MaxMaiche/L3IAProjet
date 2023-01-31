@@ -145,6 +145,7 @@ class player:
         self.pions.add(node)
 
         game.turn -= 1
+        game.end = False
 
     def isHuman(self)->bool:
         return self.type == 0
@@ -167,6 +168,7 @@ class Game:
         self.draw = False
         self.board = []
         self.turn = 1
+        self.winner = None
 
         self.players = []
         self.players.append(player(1, type1))
@@ -255,9 +257,11 @@ class Game:
         
         if self.players[0].score == 140:
             self.end = True
+            self.winner = 0
         
         if self.players[1].score == 20:
             self.end = True
+            self.winner = 1
 
         return self.end
     
@@ -265,14 +269,18 @@ class Game:
         score = 0
         p1Score = self.players[0].score
         p2Score = 140 - self.players[1].score
-        finBonus = 0
-        if self.end:
-            finBonus = 10000000
 
-        if value == 0:
-            score = p1Score - p2Score + finBonus
+        
+        if self.end:
+            if value != self.winner:
+                score = -100_000_000
+            else:
+                score = 100_000_000
         else:
-            score = p2Score - p1Score + finBonus
+            if value == 0:
+                score = p1Score - p2Score
+            elif value == 1:
+                score = p2Score - p1Score
         return score
 
     def split(self)->bool:
@@ -363,7 +371,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(2,2,1000)
+    winrateCheck(6,5,10)
 
 
 
