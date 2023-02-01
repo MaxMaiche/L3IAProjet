@@ -146,10 +146,13 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
 
     value=value-1
     coups = gameCopy.players[value].getCoupsList()
+    
+    coups = zip(coups,calculListScore(coups))
+    coups = sorted(coups, key=lambda x: x[1], reverse=True)
 
     values = []
     for coup in coups:
-
+        coup = coup[0]
         depart = gameCopy.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
 
@@ -174,10 +177,9 @@ def min_valueAB(game:game, value, nbProfondeur, alpha, beta):
         return game.eval(1-value)
    
     coups = game.players[value].getCoupsList()
-
+    
     val = MAX_VALUE
     for coup in coups:
-
         depart = game.getNode(coup[0].x,coup[0].y)
         arrive = game.getNode(coup[1].x,coup[1].y)
 

@@ -251,9 +251,17 @@ class Game:
             print(chaine)
             
     def isFinished(self)->bool:
-        if self.turn == 500:
+        if self.turn == 350:
             self.end = True
-            self.draw = True
+            p1Score = self.players[0].score
+            p2Score = 140 - self.players[1].score
+            
+            if p1Score > p2Score:
+                self.winner = 0
+            elif p2Score > p1Score:
+                self.winner = 1
+            else:
+                self.draw = True
         
         if self.players[0].score == 140:
             self.end = True
@@ -371,7 +379,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(6,5,10)
+    winrateCheck(5,5,10)
 
 
 
