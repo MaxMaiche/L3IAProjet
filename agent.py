@@ -1,6 +1,7 @@
 import game
 import random
 from copy import deepcopy
+from threading import Thread
 
 MAX_VALUE = 1_000_000
 MIN_VALUE = -1_000_000
@@ -145,13 +146,15 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
     gameCopy = deepcopy(game)
 
     value=value-1
-    coups = gameCopy.players[value].getCoupsList()
     
-    coups = zip(coups,calculListScore(coups))
-    coups = sorted(coups, key=lambda x: x[1], reverse=True)
-
+    coups = gameCopy.players[value].getCoupsListAndScore()
+    if game.turn == 1 or game.turn == 2:
+        print("Value:", value,"coups : ", coups)
+        
     values = []
     for coup in coups:
+        if coup[1]<0:
+            break
         coup = coup[0]
         depart = gameCopy.getNode(coup[0].x,coup[0].y)
         arrive = gameCopy.getNode(coup[1].x,coup[1].y)
@@ -240,3 +243,26 @@ def max_valueAB_end(game:game,value, nbProfondeur, alpha, beta):
         alpha = max(alpha, val)
 
     return val
+
+
+def ABThreadAgent(game,value,nbProfondeur):
+    value = value-1
+    
+    coupsEnnemis = game.players[1-value].getCoupsList()
+    listeScores = calculListScore(coupsEnnemis)
+    coupsEnnemis = zip(coupsEnnemis,listeScores)
+    sorted(coupsEnnemis, key=lambda x: x[1], reverse=True)
+    
+    for coup in coupsEnnemis:
+        coup = coup[0]
+        gameCopy = deepcopy(game)
+        
+        depart = gameCopy.getNode(coup[0].x,coup[0].y)
+        arrive = gameCopy.getNode(coup[1].x,coup[1].y)
+        game.players[value].play(depart, arrive, game)
+        
+        x = Thread(target=alpha_Beta_Agent, args=(gameCopy,value,nbProfondeur+1))
+        x.start()
+        x.join()
+
+    

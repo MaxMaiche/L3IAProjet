@@ -117,8 +117,26 @@ class player:
             for v in coups[key]:
                 list.append((key,v))
         return list
-
     
+
+    def getCoupsListAndScore(self):
+        coups = self.getCoupsList()
+        coupsAndScore = []
+
+        if self.value == 2:
+            for coup in coups:
+                score = coup[0].score - coup[1].score
+                coupsAndScore.append((coup,score))
+        else:
+            for coup in coups:
+                score = coup[1].score - coup[0].score
+                coupsAndScore.append((coup,score))
+                
+                                     
+        coupsAndScore = sorted(coupsAndScore, key=lambda x: x[1], reverse=True)
+        return coupsAndScore
+                
+
     def play(self, node:Node, node2:Node,game)->bool:
         node.value = 0
         node2.value = self.value
@@ -379,7 +397,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(5,5,10)
+    winrateCheck(2,2,1000)
 
 
 

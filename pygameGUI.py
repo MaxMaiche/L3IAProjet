@@ -11,7 +11,7 @@ WIDTH = int(HEIGHT*0.7)-50
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dames Chinoises")
 
-FPS = 60
+FPS = 144
 
 def draw_line(game, list:list, ligne:int, circles:list):
     circle_size = 40
@@ -96,7 +96,8 @@ def main(game):
     circles = []
     node_depart = None
     coups=set()
-    sec = 0.0
+    sec = 0
+    
    
     while run:
         clock.tick(FPS)
