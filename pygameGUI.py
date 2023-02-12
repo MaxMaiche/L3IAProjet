@@ -135,5 +135,5 @@ def main(game):
     pygame.quit()
 
 if __name__ == "__main__":
-    game = game.Game(7,7) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4+n = alphabeta + profondeur (4=1, 5=2, 6=3 etc)
+    game = game.Game(8,8) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4+n = alphabeta + profondeur (4=1, 5=2, 6=3 etc)
     main(game)

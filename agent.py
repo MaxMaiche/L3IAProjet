@@ -70,8 +70,8 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
     alpha = MIN_VALUE
     beta = MAX_VALUE
 
-    memo = dict()
-    memo[game.hash()] = alpha, beta
+
+    game.memo[game.hash()] = alpha, beta
 
     gameCopy = deepcopy(game)
     value=value-1
@@ -90,7 +90,7 @@ def alpha_Beta_Agent(game,value,nbProfondeur):
         #if gameCopy.split():
         #    values.append((coup,max_valueAB_end(gameCopy, value, nbProfondeur-1, alpha, beta)))
 
-        values.append((coup,min_valueAB(gameCopy, 1-value, nbProfondeur-1, alpha, beta, memo)))
+        values.append((coup,min_valueAB(gameCopy, 1-value, nbProfondeur-1, alpha, beta, game.memo)))
 
         gameCopy.players[value].undo(depart, arrive, gameCopy)
     
@@ -110,8 +110,10 @@ def min_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
         a,b = memo[hash]
         if a>alpha:
             alpha = a
+            testAlpha()
         if b<beta:
             beta = b
+            testBeta()
     else:
         memo[hash]= alpha, beta
 
@@ -144,9 +146,11 @@ def max_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
     if hash in memo:
         a,b = memo[hash]
         if a>alpha:
+            testAlpha()
             alpha = a
         if b<beta:
             beta = b
+            testBeta()
     else:
         memo[hash]= alpha, beta
 
@@ -232,8 +236,11 @@ def ABThreadAgent(game,value,nbProfondeur):
 
 
 
+def testAlpha():
+    return
 
-
+def testBeta():
+    return
 
 
 

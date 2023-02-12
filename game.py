@@ -187,6 +187,7 @@ class Game:
         self.board = []
         self.turn = 1
         self.winner = None
+        self.memo = dict()
 
         self.players = []
         self.players.append(player(1, type1))
@@ -391,7 +392,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(5,5,10)
+    winrateCheck(7,7,1)
 
 
 
