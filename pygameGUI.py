@@ -1,6 +1,10 @@
+import sys
 import pygame
 import game
 from screeninfo import get_monitors
+
+sys.setrecursionlimit(100000)
+
 pygame.init()
 
 HEIGHT= get_monitors()[0].height - 100

@@ -168,7 +168,7 @@ class player:
     def isHuman(self)->bool:
         return self.type == 0
 
-    def agentPlay(self, game)->bool:
+    def agentPlay(self, game)->None:
         if self.type == 1:
             game.end = agent.randomAgent(game, self.value)
         elif self.type == 2:
@@ -297,16 +297,10 @@ class Game:
         p2Score = 140 - self.players[1].score
 
         
-        if self.end:
-            if value != self.winner:
-                score = -100_000_000
-            else:
-                score = 100_000_000
-        else:
-            if value == 0:
-                score = p1Score - p2Score
-            elif value == 1:
-                score = p2Score - p1Score
+        if value == 0:
+            score = p1Score - p2Score
+        elif value == 1:
+            score = p2Score - p1Score
         return score
 
     def split(self)->bool:
@@ -397,7 +391,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(2,2,1000)
+    winrateCheck(5,5,10)
 
 
 
