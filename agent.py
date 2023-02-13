@@ -67,12 +67,14 @@ def calculListScore(list):
 
 def alpha_Beta_Agent(game,value,nbProfondeur):
 
-    alpha = MIN_VALUE
-    beta = MAX_VALUE
+    hash = game.hash()
+    if hash in game.memo:
+        alpha, beta = game.memo[hash]
+    else:
+        alpha = MIN_VALUE
+        beta = MAX_VALUE
 
-
-    game.memo[game.hash()] = alpha, beta
-
+    
     gameCopy = deepcopy(game)
     value=value-1
     coups = gameCopy.players[value].getCoupsListAndScore()
@@ -106,16 +108,20 @@ def min_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
         return game.eval(1-value)
 
     hash = game.hash()
+    change = False
     if hash in memo:
-        a,b = memo[hash]
-        if a>alpha:
-            alpha = a
-            testAlpha()
-        if b<beta:
-            beta = b
-            testBeta()
+        alphaMemo, betaMemo = memo[hash]
+        if alphaMemo > alpha:
+            alpha = alphaMemo
+            change = True
+        if betaMemo < beta:
+            beta = betaMemo
+            change = True
     else:
-        memo[hash]= alpha, beta
+        change = True
+    
+    if change:
+        memo[hash] = (alpha, beta)
 
     coups = game.players[value].getCoupsListAndScore()
 
@@ -141,18 +147,22 @@ def min_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
 def max_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
     if nbProfondeur==0 or game.isFinished():
         return game.eval(value)
-    
+
     hash = game.hash()
+    change = False
     if hash in memo:
-        a,b = memo[hash]
-        if a>alpha:
-            testAlpha()
-            alpha = a
-        if b<beta:
-            beta = b
-            testBeta()
+        alphaMemo, betaMemo = memo[hash]
+        if alphaMemo > alpha:
+            alpha = alphaMemo
+            change = True
+        if betaMemo < beta:
+            beta = betaMemo
+            change = True
     else:
-        memo[hash]= alpha, beta
+        change = True
+    
+    if change:
+        memo[hash] = (alpha, beta)
 
     coups = game.players[value].getCoupsListAndScore()
     val = MIN_VALUE

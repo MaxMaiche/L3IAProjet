@@ -182,6 +182,8 @@ class player:
 
 class Game:
     def __init__(self, type1, type2):
+        if type1 == -100 and type2 == -100:
+            return
         self.end = False
         self.draw = False
         self.board = []
@@ -233,7 +235,17 @@ class Game:
                 y+=1
                 self.getNode(x,y).score = score
             
-                
+    def __deepcopy__(self, memo):
+        game = Game(-100,-100)
+        game.end = self.end
+        game.draw = self.draw
+        game.board = deepcopy(self.board, memo)
+        game.turn = self.turn
+        game.winner = self.winner
+        game.memo = self.memo
+        game.players = deepcopy(self.players, memo)
+        return game
+
     def getBoard(self)->list:
         return self.board
 
@@ -333,10 +345,7 @@ class Game:
     def hash (self)->int:
         h = 0
         for node in self.board:
-            if node.value == 1:
-                h += node.x*11 + node.y*97
-            elif node.value == 2:
-                h += node.x*13 + node.y*101
+            h = h*3 + node.value
         
         if self.turn%2 == 0:
             h=-h
@@ -371,7 +380,36 @@ def sanityCheck(game:Game):
         node.value = "#"
         game.print()
         
-    
+def sanityCheck2(game:Game):
+    memoBoard = set()
+    memoHash = set()
+    nbCollision = 0
+    for _ in range(100000):
+        test= []
+        for i in range(10):
+            test.append(1)
+        for i in range(10):
+            test.append(2)
+        for i in range(61):
+            test.append(0)
+        random.shuffle(test)
+
+        if tuple(test) in memoBoard:
+            continue
+        else:
+            memoBoard.add(tuple(test))
+
+        for i in range(81):
+            game.board[i].value = test[i]
+        
+        h = game.hash()
+        if h in memoHash:
+            nbCollision += 1
+        else:
+            memoHash.add(h)
+
+    print("nbCollision : " + str(nbCollision))
+
 def winrateCheck(agent1, agent2, nbGame:int):
     winrate = 0
     drawcount = 0
@@ -392,7 +430,7 @@ def winrateCheck(agent1, agent2, nbGame:int):
     print("draw : " + str(drawcount/nbGame * 100) + "%")
 
 def main():
-    winrateCheck(7,7,1)
+    winrateCheck(5,5,10)
 
 
 
@@ -402,7 +440,7 @@ if __name__ == "__main__":
     g = Game(0,1)
     g.print()
     sanityCheck(g) 
+    sanityCheck2(g)
     """
     cProfile.run('main()')
     
-
