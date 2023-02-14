@@ -111,10 +111,10 @@ def min_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
     change = False
     if hash in memo:
         alphaMemo, betaMemo = memo[hash]
-        if alphaMemo > alpha:
+        if alphaMemo < alpha:
             alpha = alphaMemo
             change = True
-        if betaMemo < beta:
+        if betaMemo > beta:
             beta = betaMemo
             change = True
     else:
@@ -152,10 +152,10 @@ def max_valueAB(game:game, value, nbProfondeur, alpha, beta, memo):
     change = False
     if hash in memo:
         alphaMemo, betaMemo = memo[hash]
-        if alphaMemo > alpha:
+        if alphaMemo < alpha:
             alpha = alphaMemo
             change = True
-        if betaMemo < beta:
+        if betaMemo > beta:
             beta = betaMemo
             change = True
     else:
