@@ -7,6 +7,7 @@ sys.setrecursionlimit(100000)
 
 pygame.init()
 
+#Pour scale la fenetre en fonction de la taille de l'ecran
 HEIGHT= get_monitors()[0].height - 100
 if HEIGHT > 1000:
     HEIGHT = 1000
@@ -18,6 +19,9 @@ pygame.display.set_caption("Dames Chinoises")
 FPS = 144
 
 def draw_line(game, list:list, ligne:int, circles:list):
+    """
+    fonction qui dessine une ligne du plateau de jeu
+    """
     circle_size = 40
     total_width = (len(list) * circle_size) + ((len(list) - 1) * 20)
     x = (WIDTH - total_width) / 2
@@ -39,6 +43,9 @@ def draw_line(game, list:list, ligne:int, circles:list):
         x += circle_size + 20
 
 def draw_board(game, circles:list):
+    """
+    fonction qui dessine le plateau de jeu
+    """
     line = 70
     for y in range(8,0,-1):
         x=0
@@ -68,6 +75,9 @@ def draw_board(game, circles:list):
         line += 50
 
 def draw_coupsValide(coups:set, circles:list):
+    """
+    fonction qui dessine les coups valides
+    """
     for node in coups:
         x = node.x
         y = node.y
@@ -78,6 +88,9 @@ def draw_coupsValide(coups:set, circles:list):
 
 
 def draw_window(game,circles:list, coups:set):
+    """
+    fonction principale qui dessine la fenetre
+    """
     WIN.fill((15,85,200))
     circles.clear()
 
@@ -92,15 +105,21 @@ def draw_window(game,circles:list, coups:set):
     pygame.display.update()
 
 def wait(time):
+    """
+    fonction qui attend un certain temps
+    """
     pygame.time.wait(int(time*1000))
 
 def main(game):
+    """
+    fonction qui lance l'interface graphique
+    """
     clock = pygame.time.Clock()
     run = True
     circles = []
     node_depart = None
     coups=set()
-    sec = 0.1
+    sec = 0.01
     
    
     while run:
@@ -134,6 +153,24 @@ def main(game):
         draw_window(game, circles, coups)
     pygame.quit()
 
+
 if __name__ == "__main__":
-    game = game.Game(7,7) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4+n = alphabeta + profondeur (4=1, 5=2, 6=3 etc)
+    """C'est ici pour lancer le jeu avec l'interface graphique"""
+
+    #interface textuelle
+    print(f"Bienvenue dans le jeu de dames chinoises !\n")
+    #liste des types de joueurs
+    print(f"Liste des types de joueurs :")
+    print(f"0 : Humain")
+    print(f"1 : Random (déconseillé)")
+    print(f"2 : Greedy")
+    print(f"3 : Minimax")
+    print(f"4+n : Alphabeta + profondeur n (4=1, 5=2, 6=3 etc)")
+    print(f"Choisissez le type de joueur 1 :")
+    type1 = int(input())
+
+    print(f"Choisissez le type de joueur 2 :")
+    type2 = int(input())
+
+    game = game.Game(type1=type1, type2=type2) #0 = joueur, 1 = random, 2 = greedy,3 = minimax , 4+n = alphabeta + profondeur (4=1, 5=2, 6=3 etc)
     main(game)

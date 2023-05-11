@@ -4,9 +4,21 @@ import random
 import agent
 import sys
 import cProfile	
+import learningEval
 
 sys.setrecursionlimit(100000)
+
 class Node:
+    """
+    Classe qui représente une case du jeu
+    game: le jeu
+    x: la position x de la case
+    y: la position y de la case
+    value: la valeur de la case (0: vide, 1: joueur 1, 2: joueur 2)
+    score: le score de la case
+    voisins: les voisins de la case
+    coupsValide: les coups valides pour la case
+    """
     def __init__(self, game, x:int, y:int):
         self.game = game
         self.x = x
@@ -17,6 +29,9 @@ class Node:
         self.coupsValide = set()
         
     def setVoisins(self)->None:
+        """
+        fonction qui initialise les voisins de la case
+        """
         x=self.x
         y=self.y
         voisins = []
@@ -49,9 +64,15 @@ class Node:
         
     
     def getVoisin(self,i):
+        """
+        fonction qui retourne le voisin i de la case
+        """
         return self.voisins[i]
 
     def getCoupsValide(self)->set:
+        """
+        fonction qui retourne les coups valides pour la case
+        """
         coups = {self}
         nodes = [self]
         nodesSaut = []
@@ -72,7 +93,11 @@ class Node:
         self.coupsValide = coups
         return coups
     
-    def getCoupsSaut(self,coups,nodes:list)->set:
+
+    def getCoupsSaut(self, coups, nodes:list)->set:
+        """
+        fonction qui retourne les coups valides pour la case en sautant
+        """
         
         while len(nodes) > 0:
             node = nodes.pop()
@@ -85,16 +110,27 @@ class Node:
                         nodes.append(voisin.getVoisin(i))
                         coups.add(voisin.getVoisin(i))
         return coups
+    
 
-    def __lt__ (self, other):
+    def __lt__ (self, other: 'Node'):
+        """
+        fonction qui compare deux cases
+        """
         return self.score < other.score
 
     def __str__(self):
         return "(" + str(self.x) + "," + str(self.y) + ")"
 
 class player:
+    """
+    Classe qui représente un joueur
+    type: le type du joueur (0: joueur, 1: agentRandom, 2: agentGreedy, etc)
+    score: le score du joueur
+    pions: les pions du joueur
+    coups: les coups valides du joueur
+    """
     def __init__(self, value:int, type):
-        self.type = type # 0 = joueur, 1 = agentRandom , 2 = agentGreedy
+        self.type = type 
         self.value = value
         if value == 1:
             self.score = 20 # score de base du joueur
@@ -104,12 +140,18 @@ class player:
         self.coups = dict()
 
     def getCoups(self)->dict:
+        """
+        fonction qui retourne les coups valides du joueur
+        """
         self.coups.clear()
         for pion in self.pions:
             self.coups[pion] = pion.getCoupsValide()
         return self.coups
     
     def getCoupsList(self)->list:
+        """
+        fonction qui retourne les coups valides du joueur sous forme de liste
+        """
         coups = self.getCoups()
         
         list = []
@@ -120,6 +162,9 @@ class player:
     
 
     def getCoupsListAndScore(self):
+        """
+        fonction qui retourne les coups valides du joueur sous forme de liste avec le score de chaque coup
+        """
         coups = self.getCoupsList()
         coupsAndScore = []
 
@@ -138,6 +183,11 @@ class player:
                 
 
     def play(self, node:Node, node2:Node,game)->bool:
+        """
+        fonction qui joue un coup
+        node: la case de départ
+        node2: la case d'arrivée
+        """
         node.value = 0
         node2.value = self.value
 
@@ -153,6 +203,11 @@ class player:
         return False
 
     def undo(self, node:Node, node2:Node,game)->None:
+        """
+        fonction qui annule un coup
+        node: la case de départ
+        node2: la case d'arrivée
+        """
         node2.value = 0
         node.value = self.value
 
@@ -166,22 +221,43 @@ class player:
         game.end = False
 
     def isHuman(self)->bool:
+        """
+        fonction qui retourne si le joueur est humain
+        """
         return self.type == 0
 
     def agentPlay(self, game)->None:
+        """
+        fonction qui fait jouer l'agent
+        """
+        if self.type == -1:
+            learningEval.greedyAgentVar(game,self.value)
+        if self.type == -2:
+            learningEval.alpha_Beta_Agent_Var(game,self.value,2)
         if self.type == 1:
             game.end = agent.randomAgent(game, self.value)
         elif self.type == 2:
-            game.end = agent.greedyAgent(game,2-game.turn%2)
+            game.end = agent.greedyAgent(game,self.value)
         elif self.type == 3:
-            game.end = agent.minimaxAgent(game,2-game.turn%2,2)
+            game.end = agent.minimaxAgent(game,self.value, 3)
         elif self.type >= 4:
             profondeur = self.type - 3
-            game.end = agent.alpha_Beta_Agent(game,2-game.turn%2,profondeur)
+            game.end = agent.alpha_Beta_Agent(game,self.value,profondeur)
+        
 
 
 class Game:
-    def __init__(self, type1, type2):
+    """
+    Classe qui représente une partie
+    end: si la partie est terminée
+    draw: si la partie est nulle
+    board: le plateau de jeu
+    turn: le tour actuel
+    winner: le gagnant
+    memo: le dictionnaire qui contient les états déjà visités
+    players: les joueurs
+    """
+    def __init__(self, type1, type2, var1=None, var2=None):
         if type1 == -100 and type2 == -100:
             return
         self.end = False
@@ -191,6 +267,7 @@ class Game:
         self.winner = None
         self.memo = dict()
 
+        self.vars = [var1,var2]
         self.players = []
         self.players.append(player(1, type1))
         self.players.append(player(2, type2))
@@ -236,20 +313,31 @@ class Game:
                 self.getNode(x,y).score = score
             
     def __deepcopy__(self, memo):
+        """
+        override de la fonction deepcopy pour avoir la main sur la copie et son contenu
+        car deepcopy est très couteux en temps
+        """
         game = Game(-100,-100)
         game.end = self.end
         game.draw = self.draw
         game.board = deepcopy(self.board, memo)
         game.turn = self.turn
         game.winner = self.winner
-        game.memo = self.memo
+        game.memo = None
         game.players = deepcopy(self.players, memo)
+        game.vars = self.vars
         return game
 
     def getBoard(self)->list:
+        """
+        fonction qui retourne le plateau de jeu
+        """
         return self.board
 
     def getNode(self, x, y) -> Node:
+        """
+        fonction qui retourne le noeud aux coordonnées x,y
+        """
         if x<0 or x>8 or y<0 or y>8:
             return None
         return self.board[x*9+y]
@@ -257,6 +345,9 @@ class Game:
    
  
     def print(self):
+        """
+        fonction qui affiche le plateau de jeu en console
+        """
         for y in range(8,0,-1):
             
             chaine = "  " * y
@@ -282,6 +373,9 @@ class Game:
             print(chaine)
             
     def isFinished(self)->bool:
+        """
+        fonction qui retourne si la partie est terminée
+        """
         if self.turn == 350:
             self.end = True
             p1Score = self.players[0].score
@@ -305,6 +399,9 @@ class Game:
         return self.end
     
     def eval(self, value):
+        """
+        fonction qui retourne la valeur de l'état actuel
+        """
         score = 0
         p1Score = self.players[0].score
         p2Score = 140 - self.players[1].score
@@ -317,6 +414,10 @@ class Game:
         return score
 
     def split(self)->bool:
+        """
+        fonction qui retourne si l'état actuel est un split
+        un split est un état ou l'action d'un joueur n'a pas d'impact sur les coups possibles de l'autre joueur
+        """
 
         minP1 = 1000
         minP2 = 1000
@@ -342,7 +443,10 @@ class Game:
         else:
             return False
 
-    def hash (self)->int:
+    def hash(self)->int:
+        """
+        fonction qui retourne le hash de l'état actuel
+        """
         h = 0
         for node in self.board:
             h = h*3 + node.value
@@ -353,7 +457,9 @@ class Game:
         return h 
 
 def sanityCheck(game:Game):
-
+    """
+    fonction qui vérifie si les coups possibles sont bien les bons
+    """
     for _ in range(10):
         test= []
         for i in range(10):
@@ -381,6 +487,9 @@ def sanityCheck(game:Game):
         game.print()
         
 def sanityCheck2(game:Game):
+    """
+    fonction qui vérifie le nombre de collision de hash
+    """
     memoBoard = set()
     memoHash = set()
     nbCollision = 0
@@ -411,12 +520,18 @@ def sanityCheck2(game:Game):
     print("nbCollision : " + str(nbCollision))
 
 def winrateCheck(agent1, agent2, nbGame:int):
+    """
+    fonction qui vérifie le winrate de l'agent1 contre l'agent2
+    """
     winrate = 0
     drawcount = 0
+    sumTurn = 0
     for i in range(nbGame):
         g = Game(agent1, agent2)
         while not g.isFinished():
             g.players[(g.turn-1)%2].agentPlay(g)
+        
+        sumTurn += g.turn
         if g.draw:
             drawcount += 1
             print("game " + str(i) + " finished Draw")
@@ -428,19 +543,47 @@ def winrateCheck(agent1, agent2, nbGame:int):
             print("game " + str(i) + " finished Lose")
     print("winrate : " + str(winrate/nbGame * 100) + "%")
     print("draw : " + str(drawcount/nbGame * 100) + "%")
-
-def main():
-    winrateCheck(5,5,10)
+    #print("avg turn : " + str(sumTurn/nbGame))
 
 
+def main(type1, type2, nbGame:int):
+    """
+    fonction qui lance le programme
+    """
+    winrateCheck(type1, type2, nbGame) 
 
 
 if __name__ == "__main__":
     """
-    g = Game(0,1)
-    g.print()
-    sanityCheck(g) 
-    sanityCheck2(g)
+    C'est ici que l'on lance le programme en console
     """
-    cProfile.run('main()')
+    #interface textuelle
+    print(f"Bienvenue dans le jeu de dames chinoises !\n")
+    #liste des types de joueurs
+    print(f"Liste des types de joueurs :")
+
+    print(f"1 : Random")
+    print(f"2 : Greedy")
+    print(f"3 : Minimax")
+    print(f"4+n : Alphabeta + profondeur n (4=1, 5=2, 6=3 etc)")
+    print(f"Choisissez le type de joueur 1 :")
+    type1 = int(input())
+
+    print(f"Choisissez le type de joueur 2 :")
+    type2 = int(input())
+    print(f"Choisissez le nombre de parties :")
+
+    nbGame = int(input())
+
+    main(type1=type1, type2=type2, nbGame=nbGame) 
+    # 1 = random, 2 = greedy,3 = minimax , 4+n = alphabeta + profondeur (4=1, 5=2, 6=3 etc)
+
+
+    # g = Game(0,1)
+    # g.print()
+    # sanityCheck(g) 
+    # sanityCheck2(g)
+
+    #cProfile.run('main()')
+
     
